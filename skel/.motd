@@ -1,0 +1,7 @@
+
+  Ubuntu terminal box
+  -------------------
+  tmux          this shell already runs inside session "main"; it survives closed tabs and dropped SSH
+  gh auth login GitHub CLI (or set GH_TOKEN)
+  ~/            persisted on the volume (repos, auth, dotfiles survive redeploys)
+
