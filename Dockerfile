@@ -3,6 +3,8 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 PORT=7681
 
 # Base toolbox: shell tools, ssh server, ttyd web terminal, build deps.
+# nginx `worker_processes auto` counts host cores, not the container quota
+# (48 on Railway Metal hosts), so pin it to 2.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl wget gnupg git openssh-server ttyd nginx-light tmux \
       vim nano less htop ripgrep jq unzip zip tree procps sudo locales \
@@ -15,6 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get update && apt-get install -y --no-install-recommends gh \
   && curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh \
   && mkdir -p /run/sshd \
+  && sed -i 's/^worker_processes auto;/worker_processes 2;/' /etc/nginx/nginx.conf \
+  && grep -q '^worker_processes 2;' /etc/nginx/nginx.conf \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Skeleton for the persistent home (the volume mounts empty at /root on first boot).
