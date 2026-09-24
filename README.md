@@ -1,4 +1,4 @@
-# Deploy and Host an Ubuntu Terminal (Web Shell + SSH + tmux) on Railway
+# Deploy and Host a Linux Terminal (Ubuntu Web Shell + SSH + tmux) on Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/ubuntu-terminal?utm_medium=integration&utm_source=button&utm_campaign=ubuntu-terminal)
 
