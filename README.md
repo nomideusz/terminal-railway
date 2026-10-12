@@ -1,6 +1,6 @@
 # Deploy and Host a Linux Terminal (Ubuntu Web Shell + SSH + tmux) on Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/ubuntu-terminal?utm_medium=integration&utm_source=button&utm_campaign=ubuntu-terminal)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/ubuntu-terminal?referralCode=sLjDXb&utm_medium=integration&utm_source=button&utm_campaign=ubuntu-terminal)
 
 This template gives you an always-on Ubuntu 24.04 shell. Open your Railway domain for a terminal in the browser, or SSH in through Railway's TCP proxy. Both land in the same `tmux` session, so a job you start from your laptop is still running when you reconnect from your phone. Your home directory lives on a volume, so repos, GitHub auth and dotfiles survive every redeploy.
 
@@ -42,7 +42,7 @@ Notes and limits:
 - 512 MB of RAM is enough for a shell; size up for builds.
 - There is no Docker daemon inside the box.
 - The web terminal password is the whole security model for a root shell. Keep it strong and do not share the URL.
-- Want Claude Code preinstalled? The same author publishes a [Claude Code dev box](https://railway.com/deploy/claude-code) template.
+- Want Claude Code preinstalled? The same author publishes a [Claude Code dev box](https://railway.com/deploy/claude-code?referralCode=sLjDXb) template.
 
 ## Why Deploy an Ubuntu Terminal on Railway?
 
