@@ -82,8 +82,8 @@ nginx || log "error: nginx did not start on port $PORT"
 
 # Railway counts the kernel's cache of files this container has touched as the
 # service's memory, and with no memory pressure it is never freed: one pip
-# install shows as hundreds of MB. Drop it for the home volume every 15 min.
-( while sleep 900; do nice -n 19 drop-file-cache /root /tmp || true; done ) &
+# install shows as hundreds of MB. Drop it for the home volume every 15 min
+# (from the watch loop at the end).
 
 # Web terminal login. ttyd splits user:password at the first colon, so a user name
 # can't hold one. An empty password gets a one-off one printed here, never open access.
@@ -102,6 +102,28 @@ fi
 echo "== ubuntu-box ready: web terminal on :${PORT}, sshd on :22"
 # Web terminal: ttyd with basic auth, each tab attaches to the same tmux session, in ~.
 cd /root
-exec ttyd -i 127.0.0.1 -p "$TTYD_PORT" -W -c "$web_user:$web_pass" \
-  -t titleFixed="ubuntu-box" -t fontSize=14 \
-  bash -lc 'exec tmux new -A -s main'
+start_ttyd() {
+  ttyd -i 127.0.0.1 -p "$TTYD_PORT" -W -c "$web_user:$web_pass" \
+    -t titleFixed="ubuntu-box" -t fontSize=14 \
+    bash -lc 'exec tmux new -A -s main' &
+  ttyd_pid=$!
+}
+start_ttyd
+
+# This shell stays PID 1 and keeps the box's daemons up. ttyd used to be PID 1: a
+# `kill 1` or `pkill ttyd` from inside made it exit 0, and Railway then leaves the
+# deploy "SUCCESS" with its container EXITED, never restarted (ON_FAILURE skips exit 0),
+# so the box was dead until a manual redeploy. `kill -9 -1` left PID 1 alone but took
+# nginx down, so every request got a 502. PID 1 has no TERM trap, so signals from inside
+# the box don't reach it; Railway's stop still ends it (SIGKILL).
+# sshd is watched only if it came up at boot (not on PORT=22, not after a bad config).
+ssh_up=$(pgrep -x sshd >/dev/null && echo 1 || true)
+n=0
+while :; do
+  sleep 5
+  kill -0 "$ttyd_pid" 2>/dev/null || { log "ttyd stopped, starting it again"; start_ttyd; }
+  pgrep -x nginx >/dev/null || { log "nginx stopped, starting it again"; nginx || log "error: nginx did not start on port $PORT"; }
+  [ -z "$ssh_up" ] || pgrep -x sshd >/dev/null || { log "sshd stopped, starting it again"; /usr/sbin/sshd || true; }
+  n=$((n + 1))
+  [ $((n % 180)) = 0 ] && { nice -n 19 drop-file-cache /root /tmp || true; }
+done

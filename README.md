@@ -40,6 +40,7 @@ Notes and limits:
 
 - You are root. Anything you install outside `/root` disappears on redeploy; anything under `/root` stays.
 - 512 MB of RAM is enough for a shell; size up for builds.
+- On Free and Trial plans Railway allows 1 GB of disk outside `/root`, and `apt-get update && apt-get install nodejs npm` alone writes 600 MB there. A deploy that goes over can be stopped by Railway, so put big tools under `/root` (Node via `nvm`, Python packages in a venv) or size up to Hobby.
 - There is no Docker daemon inside the box.
 - The web terminal password is the whole security model for a root shell. Keep it strong and do not share the URL.
 - Want Claude Code preinstalled? The same author publishes a [Claude Code dev box](https://railway.com/deploy/claude-code?referralCode=sLjDXb) template.
